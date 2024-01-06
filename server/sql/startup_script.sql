@@ -1,0 +1,143 @@
+DROP TABLE IF EXISTS Education CASCADE;
+DROP TABLE IF EXISTS SchoolAddress_for CASCADE;
+DROP TABLE IF EXISTS Company CASCADE;
+DROP TABLE IF EXISTS Displays CASCADE;
+DROP TABLE IF EXISTS Resume_Has CASCADE;
+DROP TABLE IF EXISTS Skill CASCADE;
+DROP TABLE IF EXISTS Award CASCADE;
+DROP TABLE IF EXISTS Applicant CASCADE;
+DROP TABLE IF EXISTS Shows CASCADE;
+DROP TABLE IF EXISTS Applies CASCADE;
+DROP TABLE IF EXISTS Job CASCADE;
+DROP TABLE IF EXISTS Experience CASCADE;
+DROP TABLE IF EXISTS JobPosting CASCADE;
+DROP TABLE IF EXISTS Contains CASCADE;
+DROP TABLE IF EXISTS Exhibits CASCADE;
+DROP TABLE IF EXISTS Demonstrates CASCADE;
+
+CREATE TABLE Company
+    (cname VARCHAR(20) PRIMARY KEY);
+
+CREATE TABLE Resume_Has
+    (email VARCHAR(40) PRIMARY KEY, 
+    address VARCHAR(50));
+
+CREATE TABLE Skill
+    (title VARCHAR(40) PRIMARY KEY);
+
+CREATE TABLE Award
+    (title VARCHAR(40) PRIMARY KEY);
+
+CREATE TABLE Education
+    (school VARCHAR(20), 
+    degree VARCHAR(20), 
+    PRIMARY KEY (school, degree),
+    UNIQUE(school));
+
+CREATE TABLE Job
+	(job_id INTEGER PRIMARY KEY,
+	job_title VARCHAR(40),
+	cname VARCHAR(20),
+	FOREIGN KEY (cname) REFERENCES Company
+    ON DELETE CASCADE ON UPDATE CASCADE);
+
+CREATE TABLE JobPosting
+    (job_id INTEGER PRIMARY KEY, 
+    post_date DATE, 
+    FOREIGN KEY (job_id) REFERENCES Job
+    ON DELETE CASCADE ON UPDATE CASCADE);
+
+CREATE TABLE SchoolAddress_for
+    (school VARCHAR(20), 
+    address VARCHAR(50) NOT NULL,
+    PRIMARY KEY (school),
+    FOREIGN KEY (school)
+    REFERENCES Education(school)
+    ON DELETE CASCADE ON UPDATE CASCADE);
+
+CREATE TABLE Displays 
+    (school VARCHAR(20),
+    degree VARCHAR(20), 
+    grad_date DATE, 
+    email VARCHAR(40), 
+    honours BOOLEAN, 
+    PRIMARY KEY (degree, school, email),
+    FOREIGN KEY (school, degree)
+        REFERENCES Education
+        ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (email)
+        REFERENCES Resume_Has
+        ON DELETE CASCADE ON UPDATE CASCADE);
+
+CREATE TABLE Applicant
+    (name VARCHAR(40) PRIMARY KEY, 
+    email VARCHAR(40) NOT NULL UNIQUE,
+    FOREIGN KEY (email)
+    REFERENCES Resume_Has
+    ON DELETE CASCADE ON UPDATE CASCADE);
+
+CREATE TABLE Experience
+    (job_id INTEGER PRIMARY KEY, 
+    end_date DATE, 
+    start_date DATE,
+    FOREIGN KEY (job_id)
+    REFERENCES Job
+    ON DELETE CASCADE ON UPDATE CASCADE);
+
+CREATE TABLE Shows
+    (description VARCHAR(70),
+    email VARCHAR(40),
+    job_id INTEGER,
+    PRIMARY KEY (email, job_id),
+    FOREIGN KEY (job_id)
+        REFERENCES Experience
+        ON DELETE CASCADE ON UPDATE CASCADE,
+        FOREIGN KEY (email)
+        REFERENCES Resume_Has
+    ON DELETE CASCADE ON UPDATE CASCADE);
+
+CREATE TABLE Applies
+    (name VARCHAR(40), 
+    job_id INTEGER,
+    PRIMARY KEY (name, job_id),
+    FOREIGN KEY (name) 
+        REFERENCES Applicant
+        ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (job_id)
+        REFERENCES JobPosting
+    ON DELETE CASCADE ON UPDATE CASCADE);
+
+CREATE TABLE Contains
+    (title VARCHAR(40), 
+    job_id INTEGER,
+    PRIMARY KEY (job_id, title), 
+    FOREIGN KEY (title)
+        REFERENCES Skill
+    ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (job_id)
+    REFERENCES Job
+    ON DELETE CASCADE ON UPDATE CASCADE);
+
+CREATE TABLE Exhibits
+    (email VARCHAR(40), 
+    title VARCHAR(40), 
+    description VARCHAR(70), 
+    year INTEGER, 
+    PRIMARY KEY (title, email),
+    FOREIGN KEY (title)
+    REFERENCES Award
+    ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (email)
+    REFERENCES Resume_Has
+    ON DELETE CASCADE ON UPDATE CASCADE);
+
+CREATE TABLE Demonstrates
+    (title VARCHAR(40), 
+    email VARCHAR(40),
+    PRIMARY KEY (title, email),
+    FOREIGN KEY (title) 
+    REFERENCES Skill
+    ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (email)
+    REFERENCES Resume_Has
+    ON DELETE CASCADE ON UPDATE CASCADE);
